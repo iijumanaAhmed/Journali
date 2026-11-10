@@ -196,8 +196,20 @@ struct JournalView: View {
         
         // MARK: Editor Sheet
         .sheet(isPresented: $showEditor) {
-            // Call a View Named: JournalEditorView()
-        }
+            JournalEditorView { title, content, date in
+
+                let newEntry = JournalEntry(
+                    title: title,
+                    date: date,
+                    content: content
+                )
+
+                journalEntries.insert(newEntry, at: 0)
+            }
+            .preferredColorScheme(.dark)
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+            .presentationCornerRadius(32)        }
     }
 }
 
