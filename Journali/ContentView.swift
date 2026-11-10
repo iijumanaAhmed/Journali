@@ -119,7 +119,7 @@ struct ContentView: View {
                             Text("Your thoughts, your story")
                                 .font(
                                     .system(
-                                        size: min(geometry.size.width * 0.045, 19)
+                                        size: min(geometry.size.width * 0.045, 18)
                                     )
                                 )
                                 .foregroundStyle(.white.opacity(0.75))
@@ -137,7 +137,7 @@ struct ContentView: View {
                 }
                 
             } else {
-            // Call a View Named: JournalView()
+            JournalView()
             }
         }
         .preferredColorScheme(.dark)
