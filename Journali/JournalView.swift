@@ -8,11 +8,12 @@
 import SwiftUI
 
 struct JournalEntry: Identifiable {
-    
+
     let id = UUID()
-    let title: String
-    let date: String
-    let content: String
+    var title: String
+    var date: String
+    var content: String
+    var isBookmarked: Bool = false
 }
 
 // MARK: - Journal View
@@ -21,6 +22,8 @@ struct JournalView: View {
     
     @State private var searchText = ""
     @State private var showEditor = false
+    @State private var showDeleteConfirmation = false
+    @State private var selectedEntryID: UUID?
     
     @State private var journalEntries: [JournalEntry] = [
         
@@ -49,7 +52,7 @@ struct JournalView: View {
         )
     ]
     
-//    @State private var journalEntries: [JournalEntry] = []
+    //    @State private var journalEntries: [JournalEntry] = []
     
     // MARK: - Filtered Entries
     private var filteredEntries: [JournalEntry] {
@@ -61,6 +64,18 @@ struct JournalView: View {
             $0.title.localizedCaseInsensitiveContains(searchText) ||
             $0.content.localizedCaseInsensitiveContains(searchText)
         }
+    }
+    
+    // MARK: - Delete Journal
+    
+    private func deleteJournal() {
+        guard let selectedEntryID else { return }
+        
+        withAnimation {
+            journalEntries.removeAll { $0.id == selectedEntryID }
+        }
+        
+        self.selectedEntryID = nil
     }
     
     // MARK: - Body
@@ -148,11 +163,37 @@ struct JournalView: View {
                     ScrollView {
                         LazyVStack(spacing: 16) {
                             ForEach(filteredEntries) { entry in
-                                JournalCard(
-                                    title: entry.title,
-                                    date: entry.date,
-                                    content: entry.content
-                                )
+
+                                ForEach(filteredEntries) { entry in
+
+                                    JournalCard(
+                                        title: entry.title,
+                                        date: entry.date,
+                                        content: entry.content,
+                                        isBookmarked: entry.isBookmarked,
+
+                                        // Bookmark
+                                        onBookmark: {
+                                            if let index = journalEntries.firstIndex(
+                                                where: { $0.id == entry.id }
+                                            ) {
+                                                journalEntries[index].isBookmarked.toggle()
+                                            }
+                                        },
+
+                                        // Edit
+                                        onEdit: {
+                                            showEditor = true
+                                        },
+
+                                        // Delete
+                                        onDelete: {
+                                            selectedEntryID = entry.id
+                                            showDeleteConfirmation = true
+                                        }
+                                    )
+                                }
+
                             }
                         }
                         .padding(.bottom, 20)
@@ -197,62 +238,141 @@ struct JournalView: View {
         // MARK: Editor Sheet
         .sheet(isPresented: $showEditor) {
             JournalEditorView { title, content, date in
-
+                
                 let newEntry = JournalEntry(
                     title: title,
                     date: date,
                     content: content
                 )
-
+                
                 journalEntries.insert(newEntry, at: 0)
             }
             .preferredColorScheme(.dark)
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
-            .presentationCornerRadius(32)        }
+            .presentationCornerRadius(32)
+        }
     }
 }
 
+
+
+
 // MARK: - Journal Card
+
 struct JournalCard: View {
+    
     let title: String
     let date: String
     let content: String
+    let isBookmarked: Bool
+    
+    let onBookmark: () -> Void
+    let onEdit: () -> Void
+    let onDelete: () -> Void
+    
+    @State private var offset: CGFloat = 0
+    private let deleteButtonWidth: CGFloat = 100
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(title)
-                        .font(.system(size: 24, weight: .semibold))
+        ZStack(alignment: .trailing) {
+            // MARK: Delete Button
+            Button {
+                onDelete()
+            } label: {
+                Image(systemName: "trash")
+                    .font(.system(size: 24, weight: .medium))
+                    .foregroundStyle(.white)
+                    .frame(width: deleteButtonWidth, height: 80)
+                    .background(Color(red: 1.0, green: 0.25, blue: 0.23))
+                    .clipShape(Capsule())
+            }
+            .buttonStyle(.plain)
+            
+            // MARK: Journal Content
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(title)
+                            .font(.system(size: 29, weight: .semibold))
+                            .foregroundStyle(
+                                Color(red: 0.68, green: 0.57, blue: 1.0)
+                            )
+                        
+                        Text(date)
+                            .font(.system(size: 14))
+                            .foregroundStyle(.gray)
+                    }
+                    
+                    Spacer()
+                    
+                    // MARK: Bookmark Button
+                    Button {
+                        onBookmark()
+                    } label: {
+                        Image(systemName: isBookmarked
+                              ? "bookmark.fill"
+                              : "bookmark")
+                        .font(.system(size: 30))
                         .foregroundStyle(
                             Color(red: 0.68, green: 0.57, blue: 1.0)
                         )
-                    Text(date)
-                        .font(.system(size: 14))
-                        .foregroundStyle(.gray)
+                    }
+                    .buttonStyle(.plain)
                 }
                 
-                Spacer()
-                
-                Image(systemName: "bookmark")
-                    .font(.system(size: 24))
-                    .foregroundStyle(
-                        Color(red: 0.68, green: 0.57, blue: 1.0)
-                    )
+                Text(content)
+                    .font(.system(size: 18))
+                    .foregroundStyle(.white)
+                    .lineSpacing(2)
+                    .lineLimit(5)
+                    .padding(.top, 28)
             }
+            .padding(28)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color(red: 0.11, green: 0.11, blue: 0.12))
+            .clipShape(RoundedRectangle(cornerRadius: 38))
+            .offset(x: offset)
+            .contentShape(RoundedRectangle(cornerRadius: 38))
+            .onTapGesture {
+                if offset == 0 {
+                    onEdit()
+                } else {
+                    withAnimation(.spring(response: 0.3)) {
+                        offset = 0
+                    }
+                }
+            }
+            .gesture(
+                DragGesture(minimumDistance: 20)
+                    .onChanged { value in
+                        
+                        guard abs(value.translation.width) >
+                                abs(value.translation.height) else {
+                            return
+                        }
+                        
+                        let newOffset = value.translation.width
+                        
+                        offset = min(
+                            0,
+                            max(newOffset, -deleteButtonWidth)
+                        )
+                    }
+                    .onEnded { value in
+                        
+                        withAnimation(.spring(response: 0.3)) {
+                            if value.translation.width < -40 {
+                                offset = -deleteButtonWidth
+                            } else {
+                                offset = 0
+                            }
+                        }
+                    }
+            )
             
-            Text(content)
-                .font(.system(size: 18))
-                .foregroundStyle(.white)
-                .lineSpacing(2)
-                .lineLimit(5)
-                .padding(.top, 28)
         }
-        .padding(28)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(red: 0.11, green: 0.11, blue: 0.12))
-        .clipShape(RoundedRectangle(cornerRadius: 32))
+        .clipShape(RoundedRectangle(cornerRadius: 38))
     }
 }
 
