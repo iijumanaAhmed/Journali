@@ -1,40 +1,66 @@
-//
-//  JournalEditorView.swift
-//  Journali
-//
-//  Created by Jumana Khawaij on 30/05/1448 AH.
-//
 
 import SwiftUI
 
 struct JournalEditorView: View {
 
     @Environment(\.dismiss) private var dismiss
-
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
-    @State private var title = ""
-    @State private var journalText = ""
+    // MARK: - Journal Data
 
+    private let entry: JournalEntry?
     let onSave: (String, String, String) -> Void
 
+    @State private var title: String
+    @State private var journalText: String
+
+    // MARK: - Initializer
+
+    init(
+        entry: JournalEntry? = nil,
+        onSave: @escaping (String, String, String) -> Void
+    ) {
+        self.entry = entry
+        self.onSave = onSave
+
+        _title = State(initialValue: entry?.title ?? "")
+        _journalText = State(initialValue: entry?.content ?? "")
+    }
+
+    // MARK: - Date
+
     private var currentDate: String {
+
         let formatter = DateFormatter()
         formatter.dateFormat = "dd/MM/yyyy"
+
         return formatter.string(from: Date())
     }
 
+    // Preserve the original date when editing
+    private var displayDate: String {
+        currentDate
+    }
+
+    // MARK: - Body
+
     var body: some View {
+
         ZStack {
+
             Color(red: 0.11, green: 0.11, blue: 0.12)
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 0) {
+
                 // Top buttons
+
                 HStack {
+
                     Button {
                         dismiss()
                     } label: {
+
                         Image(systemName: "xmark")
                             .font(.system(size: 23))
                             .foregroundStyle(.white)
@@ -46,45 +72,56 @@ struct JournalEditorView: View {
                     Spacer()
 
                     Button {
-                        onSave(title, journalText, currentDate)
+
+                        onSave(title, journalText, displayDate)
                         dismiss()
+
                     } label: {
+
                         Image(systemName: "checkmark")
                             .font(.system(size: 26, weight: .medium))
                             .foregroundStyle(.black)
                             .frame(width: 56, height: 56)
-                            .background(Color(red: 0.52, green: 0.48, blue: 1.0))
+                            .background(
+                                Color(red: 0.52, green: 0.48, blue: 1.0)
+                            )
                             .clipShape(Circle())
                     }
                     .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty)
-                    .opacity(title.trimmingCharacters(in: .whitespaces).isEmpty ? 0.5 : 1)
+                    .opacity(
+                        title.trimmingCharacters(in: .whitespaces).isEmpty ? 0.5 : 1
+                    )
                 }
 
                 // Title
+
                 TextField("Title", text: $title)
-                    .font(.system(size: 34, weight: .bold))
+                    .font(.system(size: 38, weight: .bold))
                     .foregroundStyle(.white)
                     .padding(.top, 16)
 
                 // Date
-                Text(currentDate)
-                    .font(.system(size: 16))
+
+                Text(displayDate)
+                    .font(.system(size: 20))
                     .foregroundStyle(.gray)
                     .padding(.top, 10)
 
                 // Journal content
+
                 ZStack(alignment: .topLeading) {
 
                     if journalText.isEmpty {
+
                         Text("Type your Journal...")
-                            .font(.system(size: 20))
+                            .font(.system(size: 22))
                             .foregroundStyle(.gray.opacity(0.6))
                             .padding(.top, 8)
                             .padding(.leading, 5)
                     }
 
                     TextEditor(text: $journalText)
-                        .font(.system(size: 20))
+                        .font(.system(size: 21))
                         .foregroundStyle(.white)
                         .scrollContentBackground(.hidden)
                         .background(Color.clear)
@@ -102,7 +139,10 @@ struct JournalEditorView: View {
     }
 }
 
+// MARK: - Preview
+
 #Preview {
+
     JournalEditorView { title, content, date in
         print(title, content, date)
     }
