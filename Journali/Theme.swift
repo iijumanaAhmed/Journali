@@ -1,9 +1,3 @@
-//
-//  Theme.swift
-//  Journali
-//
-//  Created by Jumana Khawaij on 06/06/1448 AH.
-//
 import SwiftUI
 
 extension Color {

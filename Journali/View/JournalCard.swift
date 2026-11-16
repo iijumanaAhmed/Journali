@@ -1,9 +1,3 @@
-//
-//  JournalCard.swift
-//  Journali
-//
-//  Created by Jumana Khawaij on 07/06/1448 AH.
-//
 import SwiftUI
 
 struct JournalCard: View {

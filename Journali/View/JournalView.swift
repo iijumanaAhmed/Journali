@@ -1,9 +1,3 @@
-//
-//  JournalView.swift
-//  Journali
-//
-//  Created by Jumana Khawaij on 07/06/1448 AH.
-//
 import SwiftUI
 
 struct JournalView: View {

@@ -1,4 +1,3 @@
-//DONE ✅
 import SwiftUI
 
 struct ContentView: View {
