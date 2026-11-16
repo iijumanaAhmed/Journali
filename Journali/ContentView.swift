@@ -1,11 +1,8 @@
-
+//DONE ✅
 import SwiftUI
 
 struct ContentView: View {
-    
     @State private var showSplash = true
-    
-    // Animation states
     @State private var logoFloating = false
     @State private var logoPulsing = false
     @State private var textAppeared = false
@@ -15,13 +12,8 @@ struct ContentView: View {
             if showSplash {
                 GeometryReader { geometry in
                     ZStack {
-                        Color.black
-                        
-                        // Lavender — #AF99FD
                         Circle()
-                            .foregroundStyle(
-                                Color(red: 0.686, green: 0.600, blue: 0.992)
-                            )
+                            .foregroundStyle(Color.accentPrimary)
                             .frame(width: geometry.size.width * 0.8)
                             .blur(radius: 100)
                             .offset(
@@ -30,11 +22,8 @@ struct ContentView: View {
                             )
                             .opacity(0.35)
                         
-                        // Periwinkle — #7F81FF
                         Circle()
-                            .foregroundStyle(
-                                Color(red: 0.498, green: 0.506, blue: 1.000)
-                            )
+                            .foregroundStyle(Color.accentPrimary)
                             .frame(width: geometry.size.width * 0.7)
                             .blur(radius: 110)
                             .offset(
@@ -43,11 +32,8 @@ struct ContentView: View {
                             )
                             .opacity(0.3)
                         
-                        // Burnt Orange — #B75718
                         Circle()
-                            .foregroundStyle(
-                                Color(red: 0.718, green: 0.341, blue: 0.094)
-                            )
+                            .foregroundStyle(Color.orange)
                             .frame(width: geometry.size.width * 0.65)
                             .blur(radius: 110)
                             .offset(
@@ -56,7 +42,6 @@ struct ContentView: View {
                             )
                             .opacity(0.3)
                         
-                        // White
                         Circle()
                             .fill(.white)
                             .frame(width: geometry.size.width * 0.3)
@@ -67,8 +52,7 @@ struct ContentView: View {
                             )
                             .opacity(0.08)
                         
-                        VStack(spacing: geometry.size.height * 0.025) {
-                            // MARK: Animated Logo
+                        VStack(spacing: geometry.size.height * 0.015) {
                             Image("logo")
                                 .resizable()
                                 .scaledToFit()
@@ -79,50 +63,40 @@ struct ContentView: View {
                                 .scaleEffect(logoPulsing ? 1.06 : 0.96)
                                 .offset(y: logoFloating ? -10 : 10)
                                 .shadow(
-                                    color: Color(red: 0.686, green: 0.600, blue: 0.992)
+                                    color: Color.accentPrimary
                                         .opacity(logoPulsing ? 0.45 : 0.12),
                                     radius: logoPulsing ? 25 : 8
                                 )
                                 .onAppear {
-                                    
-                                    // Floating movement
                                     withAnimation(
                                         .easeInOut(duration: 2)
                                         .repeatForever(autoreverses: true)
-                                    ) {
-                                        logoFloating = true
-                                    }
-                                    
-                                    // Breathing and glow
+                                    ) { logoFloating = true }
                                     withAnimation(
                                         .easeInOut(duration: 1.8)
                                         .repeatForever(autoreverses: true)
-                                    ) {
-                                        logoPulsing = true
-                                    }
+                                    ) { logoPulsing = true }
                                 }
                             
-                            // MARK: App Name
                             Text("Journali")
                                 .font(
                                     .system(
-                                        size: min(geometry.size.width * 0.10, 42),
+                                        size: min(geometry.size.width * 0.10, AppFonts.display),
                                         weight: .bold
                                     )
                                 )
-                                .foregroundStyle(.white
-                                )
+                                .foregroundStyle(Color.primaryText)
                                 .opacity(textAppeared ? 1 : 0)
                                 .offset(y: textAppeared ? 0 : 12)
                             
-                            // MARK: Subtitle
                             Text("Your thoughts, your story")
                                 .font(
                                     .system(
-                                        size: min(geometry.size.width * 0.045, 18)
+                                        size: min(geometry.size.width * 0.045, AppFonts.bodyM),
+                                        weight: .light
                                     )
                                 )
-                                .foregroundStyle(.white.opacity(0.75))
+                                .foregroundStyle(Color.primaryText)
                                 .opacity(textAppeared ? 1 : 0)
                                 .offset(y: textAppeared ? 0 : 12)
                         }
@@ -137,7 +111,7 @@ struct ContentView: View {
                 }
                 
             } else {
-            JournalView()
+                JournalView()
             }
         }
         .preferredColorScheme(.dark)

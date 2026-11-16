@@ -1,66 +1,44 @@
-
 import SwiftUI
 
 struct JournalEditorView: View {
-
     @Environment(\.dismiss) private var dismiss
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-
-    // MARK: - Journal Data
-
+    
     private let entry: JournalEntry?
     let onSave: (String, String, String) -> Void
-
+    
     @State private var title: String
     @State private var journalText: String
-
-    // MARK: - Initializer
-
+    @State private var showDiscardAlert = false
+    
     init(
         entry: JournalEntry? = nil,
         onSave: @escaping (String, String, String) -> Void
     ) {
         self.entry = entry
         self.onSave = onSave
-
+        
         _title = State(initialValue: entry?.title ?? "")
         _journalText = State(initialValue: entry?.content ?? "")
     }
-
-    // MARK: - Date
-
+    
     private var currentDate: String {
-
         let formatter = DateFormatter()
         formatter.dateFormat = "dd/MM/yyyy"
-
+        
         return formatter.string(from: Date())
     }
-
-    // Preserve the original date when editing
-    private var displayDate: String {
-        currentDate
-    }
-
-    // MARK: - Body
-
+    
+    private var displayDate: String { currentDate }
+    
     var body: some View {
-
         ZStack {
-
-            Color(red: 0.11, green: 0.11, blue: 0.12)
-                .ignoresSafeArea()
-
             VStack(alignment: .leading, spacing: 0) {
-
-                // Top buttons
-
                 HStack {
-
                     Button {
-                        dismiss()
+                        showDiscardAlert = true
                     } label: {
-
+                        
                         Image(systemName: "xmark")
                             .font(.system(size: 23))
                             .foregroundStyle(.white)
@@ -68,16 +46,15 @@ struct JournalEditorView: View {
                             .background(Color.black.opacity(0.25))
                             .clipShape(Circle())
                     }
-
+                    
                     Spacer()
-
+                    
                     Button {
-
                         onSave(title, journalText, displayDate)
                         dismiss()
-
+                        
                     } label: {
-
+                        
                         Image(systemName: "checkmark")
                             .font(.system(size: 26, weight: .medium))
                             .foregroundStyle(.black)
@@ -92,34 +69,34 @@ struct JournalEditorView: View {
                         title.trimmingCharacters(in: .whitespaces).isEmpty ? 0.5 : 1
                     )
                 }
-
+                
                 // Title
-
+                
                 TextField("Title", text: $title)
                     .font(.system(size: 38, weight: .bold))
                     .foregroundStyle(.white)
                     .padding(.top, 16)
-
+                
                 // Date
-
+                
                 Text(displayDate)
                     .font(.system(size: 20))
                     .foregroundStyle(.gray)
                     .padding(.top, 10)
-
+                
                 // Journal content
-
+                
                 ZStack(alignment: .topLeading) {
-
+                    
                     if journalText.isEmpty {
-
+                        
                         Text("Type your Journal...")
                             .font(.system(size: 22))
                             .foregroundStyle(.gray.opacity(0.6))
                             .padding(.top, 8)
                             .padding(.leading, 5)
                     }
-
+                    
                     TextEditor(text: $journalText)
                         .font(.system(size: 21))
                         .foregroundStyle(.white)
@@ -127,7 +104,7 @@ struct JournalEditorView: View {
                         .background(Color.clear)
                 }
                 .padding(.top, 25)
-
+                
                 Spacer(minLength: 0)
             }
             .frame(maxWidth: 760)
@@ -136,13 +113,25 @@ struct JournalEditorView: View {
             .padding(.top, 20)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+        .alert("Discard Changes?", isPresented: $showDiscardAlert) {
+            
+            Button("Discard Changes", role: .destructive) {
+                dismiss()
+            }
+            
+            Button("Keep Editing", role: .cancel) {
+                // Stay in the editor
+            }
+            
+        } message: {
+            Text("Are you sure you want to discard changes on this journal?")
+        }
     }
 }
 
 // MARK: - Preview
 
 #Preview {
-
     JournalEditorView { title, content, date in
         print(title, content, date)
     }
