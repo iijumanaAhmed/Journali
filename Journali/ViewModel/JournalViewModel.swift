@@ -50,6 +50,12 @@ class JournalViewModel: ObservableObject {
         )
     ]
     
+    private static let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd/MM/yyyy"
+        return formatter
+    }()
+    
     @Published var sortOption: JournalSortOption = .date
     func filteredEntries(searchText: String) -> [JournalEntry] {
         
@@ -80,17 +86,18 @@ class JournalViewModel: ObservableObject {
         content: String,
         date: String
     ) {
-        
         guard let index = journalEntries.firstIndex(where: {
             $0.id == id
         }) else { return }
-        
+
+        let dateChanged = journalEntries[index].date != date
+
         journalEntries[index].title = title
         journalEntries[index].content = content
         journalEntries[index].date = date
-        
-        if sortOption == .date {
-            sortJournal(by: sortOption)
+
+        if sortOption == .date && dateChanged {
+            sortJournal(by: .date)
         }
     }
     
@@ -132,15 +139,16 @@ class JournalViewModel: ObservableObject {
                 }
                 
             case .date:
-                let formatter = DateFormatter()
-                formatter.dateFormat = "dd/MM/yyyy"
-                
-                journalEntries.sort {
-                    let date1 = formatter.date(from: $0.date) ?? .distantPast
-                    let date2 = formatter.date(from: $1.date) ?? .distantPast
-                    
-                    return date1 > date2
+                let sortedEntries = journalEntries.map { entry in
+                    (
+                        entry: entry,
+                        parsedDate: Self.dateFormatter.date(from: entry.date) ?? .distantPast
+                    )
                 }
+
+                journalEntries = sortedEntries
+                    .sorted { $0.parsedDate > $1.parsedDate }
+                    .map { $0.entry }
             }
         }
     }

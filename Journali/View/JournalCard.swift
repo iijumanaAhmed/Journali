@@ -1,12 +1,7 @@
 import SwiftUI
 
 struct JournalCard: View {
-    
-    let title: String
-    let date: String
-    let content: String
-    let isBookmarked: Bool
-    
+    let entry: JournalEntry
     let onTap: () -> Void
     let onToggleBookmark: () -> Void
     let onDelete: () -> Void
@@ -36,11 +31,11 @@ struct JournalCard: View {
                     
                     VStack(alignment: .leading, spacing: 6) {
                         
-                        Text(title)
+                        Text(entry.title)
                             .font(.system(size: AppFonts.headingM, weight: .semibold))
                             .foregroundStyle(Color.accentText)
                         
-                        Text(date)
+                        Text(entry.date)
                             .font(.system(size: AppFonts.bodyM))
                             .foregroundStyle(.gray)
                     }
@@ -50,7 +45,7 @@ struct JournalCard: View {
                     Button {
                         onToggleBookmark()
                     } label: {
-                        Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
+                        Image(systemName: entry.isBookmarked ? "bookmark.fill" : "bookmark")
                             .font(.system(size: AppFonts.headingM))
                             .foregroundStyle(Color.accentText)
                             .contentTransition(.symbolEffect(.replace))
@@ -58,7 +53,7 @@ struct JournalCard: View {
                     .buttonStyle(.plain)
                 }
                 
-                Text(content)
+                Text(entry.content)
                     .font(.system(size: AppFonts.bodyL))
                     .foregroundStyle(Color.primaryText)
                     .lineSpacing(2)

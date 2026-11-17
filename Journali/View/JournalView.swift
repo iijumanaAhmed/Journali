@@ -13,7 +13,9 @@ struct JournalView: View {
     
     @State private var showDeleteConfirmation = false
     @State private var selectedEntryID: UUID?
-    
+    private var filteredEntries: [JournalEntry] {
+        viewModel.filteredEntries(searchText: searchText)
+    }
     
     var body: some View {
         NavigationStack {
@@ -21,8 +23,7 @@ struct JournalView: View {
                 
                 VStack {
                     
-                    if viewModel.filteredEntries(searchText: searchText).isEmpty
-                        && searchText.isEmpty {
+                    if filteredEntries.isEmpty && searchText.isEmpty {
                         
                         GeometryReader { geometry in
                             VStack(spacing: geometry.size.height * 0.015) {
@@ -69,13 +70,10 @@ struct JournalView: View {
                         ScrollView {
                             LazyVStack(spacing: 16) {
                                 
-                                ForEach(viewModel.filteredEntries(searchText: searchText)) { entry in
+                                ForEach(filteredEntries) { entry in
                                     
                                     JournalCard(
-                                        title: entry.title,
-                                        date: entry.date,
-                                        content: entry.content,
-                                        isBookmarked: entry.isBookmarked,
+                                        entry: entry,
                                         
                                         onTap: {
                                             selectedJournal = entry
@@ -117,25 +115,22 @@ struct JournalView: View {
                 
                 JournalEditorView(entry: selectedJournal) { title, content, date in
                     
-                    if let selectedJournal {
-                        
+                    if let entry = selectedJournal {
                         viewModel.updateJournal(
-                            id: selectedJournal.id,
+                            id: entry.id,
                             title: title,
                             content: content,
                             date: date
                         )
-                        
                     } else {
-                        
                         viewModel.addJournal(
                             title: title,
                             content: content,
                             date: date
                         )
                     }
-                    
-                    self.selectedJournal = nil
+                                        
+                    selectedJournal = nil
                 }
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)

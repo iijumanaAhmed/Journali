@@ -5,6 +5,9 @@ struct JournalEditorView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     private let entry: JournalEntry?
+    private var isTitleEmpty: Bool {
+        title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
     let onSave: (String, String, String) -> Void
     
     @State private var title: String
@@ -50,7 +53,13 @@ struct JournalEditorView: View {
                     Spacer()
                     
                     Button {
-                        onSave(title, journalText, displayDate)
+                        guard !isTitleEmpty else { return }
+
+                        onSave(
+                            title.trimmingCharacters(in: .whitespacesAndNewlines),
+                            journalText,
+                            displayDate
+                        )
                         dismiss()
                         
                     } label: {
@@ -64,10 +73,8 @@ struct JournalEditorView: View {
                             )
                             .clipShape(Circle())
                     }
-                    .disabled(title.trimmingCharacters(in: .whitespaces).isEmpty)
-                    .opacity(
-                        title.trimmingCharacters(in: .whitespaces).isEmpty ? 0.5 : 1
-                    )
+                    .disabled(isTitleEmpty)
+                    .opacity(isTitleEmpty ? 0.5 : 1)
                 }
                 
                 // Title
