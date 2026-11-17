@@ -2,63 +2,66 @@ import SwiftUI
 import Combine
 
 class JournalViewModel: ObservableObject {
-        
-    @Published var journalEntries: [JournalEntry] = [
-        JournalEntry(
-            title: "A Beautiful Day",
-            date: "17/11/2026",
-            content: "Today was such a lovely day. I spent time with my friends, enjoyed a good coffee, and felt grateful for the little things in life.",
-            isBookmarked: true
-        ),
-        
-        JournalEntry(
-            title: "Finding Myself",
-            date: "15/11/2026",
-            content: "Lately, I have been thinking about my goals and the person I want to become. I want to focus more on myself and enjoy the journey."
-        ),
-        
-        JournalEntry(
-            title: "Small Achievements",
-            date: "12/11/2026",
-            content: "I finally completed a task that I had been postponing for weeks. It feels good to make progress, even when it is just a small step.",
-            isBookmarked: true
-        ),
-        
-        JournalEntry(
-            title: "A Little Overwhelmed",
-            date: "10/11/2026",
-            content: "There is so much happening around me right now. I need to slow down, take a deep breath, and remind myself that everything takes time."
-        ),
-        
-        JournalEntry(
-            title: "Weekend Memories",
-            date: "08/11/2026",
-            content: "I had a wonderful weekend with my family. We laughed, shared stories, and made memories that I hope to remember for a long time."
-        ),
-        
-        JournalEntry(
-            title: "Dear Future Me",
-            date: "05/11/2026",
-            content: "I hope you are proud of how far you have come. Keep believing in yourself, stay curious, and never forget to appreciate your progress.",
-            isBookmarked: true
-        ),
-        
-        JournalEntry(
-            title: "A Fresh Start",
-            date: "01/11/2026",
-            content: "A new month means new opportunities. I want to build better habits, read more books, and make more time for the things I love."
-        )
-    ]
+// Dummy Data For Testing:
+//    @Published var journalEntries: [JournalEntry] = [
+//        JournalEntry(
+//            title: "A Beautiful Day",
+//            date: "17/11/2026",
+//            content: "Today was such a lovely day. I spent time with my friends, enjoyed a good coffee, and felt grateful for the little things in life.",
+//            isBookmarked: true
+//        ),
+//        
+//        JournalEntry(
+//            title: "Finding Myself",
+//            date: "15/11/2026",
+//            content: "Lately, I have been thinking about my goals and the person I want to become. I want to focus more on myself and enjoy the journey."
+//        ),
+//        
+//        JournalEntry(
+//            title: "Small Achievements",
+//            date: "12/11/2026",
+//            content: "I finally completed a task that I had been postponing for weeks. It feels good to make progress, even when it is just a small step.",
+//            isBookmarked: true
+//        ),
+//        
+//        JournalEntry(
+//            title: "A Little Overwhelmed",
+//            date: "10/11/2026",
+//            content: "There is so much happening around me right now. I need to slow down, take a deep breath, and remind myself that everything takes time."
+//        ),
+//        
+//        JournalEntry(
+//            title: "Weekend Memories",
+//            date: "08/11/2026",
+//            content: "I had a wonderful weekend with my family. We laughed, shared stories, and made memories that I hope to remember for a long time."
+//        ),
+//        
+//        JournalEntry(
+//            title: "Dear Future Me",
+//            date: "05/11/2026",
+//            content: "I hope you are proud of how far you have come. Keep believing in yourself, stay curious, and never forget to appreciate your progress.",
+//            isBookmarked: true
+//        ),
+//        
+//        JournalEntry(
+//            title: "A Fresh Start",
+//            date: "01/11/2026",
+//            content: "A new month means new opportunities. I want to build better habits, read more books, and make more time for the things I love."
+//        )
+//    ]
     
+    @Published var journalEntries: [JournalEntry] = []
+    @Published var sortOption: JournalSortOption = .date
+
+    // MARK: - Date Formatting
     private static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "dd/MM/yyyy"
         return formatter
     }()
     
-    @Published var sortOption: JournalSortOption = .date
+    // MARK: - Searching
     func filteredEntries(searchText: String) -> [JournalEntry] {
-        
         guard !searchText.isEmpty else {
             return journalEntries
         }
@@ -69,8 +72,30 @@ class JournalViewModel: ObservableObject {
         }
     }
     
+    // MARK: - Journal Management
+    func saveJournal(
+        entry: JournalEntry?,
+        title: String,
+        content: String,
+        date: String
+    ) {
+        if let entry {
+            updateJournal(
+                id: entry.id,
+                title: title,
+                content: content,
+                date: date
+            )
+        } else {
+            addJournal(
+                title: title,
+                content: content,
+                date: date
+            )
+        }
+    }
+
     func addJournal(title: String, content: String, date: String) {
-        
         let newEntry = JournalEntry(
             title: title,
             date: date,
@@ -102,7 +127,6 @@ class JournalViewModel: ObservableObject {
     }
     
     func deleteJournal(id: UUID) {
-        
         withAnimation {
             journalEntries.removeAll {
                 $0.id == id
@@ -111,7 +135,6 @@ class JournalViewModel: ObservableObject {
     }
     
     func toggleBookmark(for id: UUID) {
-        
         withAnimation {
             guard let index = journalEntries.firstIndex(where: {
                 $0.id == id
@@ -125,14 +148,12 @@ class JournalViewModel: ObservableObject {
         }
     }
     
+    // MARK: - Sorting
     func sortJournal(by option: JournalSortOption) {
-        
         sortOption = option
         
         withAnimation {
-            
             switch sortOption {
-                
             case .bookmarks:
                 journalEntries.sort {
                     $0.isBookmarked && !$1.isBookmarked

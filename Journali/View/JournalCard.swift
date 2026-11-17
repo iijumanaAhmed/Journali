@@ -14,34 +14,34 @@ struct JournalCard: View {
     var body: some View {
         ZStack(alignment: .trailing) {
             
+            // Delete Button
             Button {
                 onDelete()
             } label: {
                 Image(systemName: "trash")
                     .font(.system(size: AppFonts.bodyM, weight: .medium))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color.primaryText)
                     .frame(width: deleteButtonWidth, height: 46)
-                    .background(Color.red)
+                    .background(Color.semantic)
                     .clipShape(RoundedRectangle(cornerRadius: 23))
             }
             
+            // Journal Content
             VStack(alignment: .leading, spacing: 0) {
-                
                 HStack(alignment: .top) {
-                    
                     VStack(alignment: .leading, spacing: 6) {
-                        
                         Text(entry.title)
                             .font(.system(size: AppFonts.headingM, weight: .semibold))
                             .foregroundStyle(Color.accentText)
                         
                         Text(entry.date)
                             .font(.system(size: AppFonts.bodyM))
-                            .foregroundStyle(.gray)
+                            .foregroundStyle(Color.secondaryText)
                     }
                     
                     Spacer()
                     
+                    // Bookmark Button
                     Button {
                         onToggleBookmark()
                     } label: {

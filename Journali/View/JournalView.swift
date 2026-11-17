@@ -1,18 +1,17 @@
 import SwiftUI
 
 struct JournalView: View {
-    
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     
     @StateObject private var viewModel = JournalViewModel()
     
     // UI States
     @State private var searchText = ""
-    @State private var showEditor = false
-    @State private var selectedJournal: JournalEntry?
-    
+    @State private var editorSheet: JournalEditorSheet?
     @State private var showDeleteConfirmation = false
     @State private var selectedEntryID: UUID?
+    
+    // MARK: - Filtered Entries
     private var filteredEntries: [JournalEntry] {
         viewModel.filteredEntries(searchText: searchText)
     }
@@ -20,9 +19,7 @@ struct JournalView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                
                 VStack {
-                    
                     if filteredEntries.isEmpty && searchText.isEmpty {
                         
                         GeometryReader { geometry in
@@ -66,18 +63,14 @@ struct JournalView: View {
                         }
                         
                     } else {
-                        
                         ScrollView {
                             LazyVStack(spacing: 16) {
-                                
                                 ForEach(filteredEntries) { entry in
-                                    
                                     JournalCard(
                                         entry: entry,
-                                        
+
                                         onTap: {
-                                            selectedJournal = entry
-                                            showEditor = true
+                                            editorSheet = JournalEditorSheet(entry: entry)
                                         },
                                         
                                         onToggleBookmark: {
@@ -102,7 +95,6 @@ struct JournalView: View {
             }
             
             // MARK: - Search
-            
             .searchable(
                 text: $searchText,
                 placement: .automatic,
@@ -110,27 +102,14 @@ struct JournalView: View {
             )
             
             // MARK: - Editor
-            
-            .sheet(isPresented: $showEditor) {
-                
-                JournalEditorView(entry: selectedJournal) { title, content, date in
-                    
-                    if let entry = selectedJournal {
-                        viewModel.updateJournal(
-                            id: entry.id,
-                            title: title,
-                            content: content,
-                            date: date
-                        )
-                    } else {
-                        viewModel.addJournal(
-                            title: title,
-                            content: content,
-                            date: date
-                        )
-                    }
-                                        
-                    selectedJournal = nil
+            .sheet(item: $editorSheet) { sheet in
+                JournalEditorView(entry: sheet.entry) { title, content, date in
+                    viewModel.saveJournal(
+                        entry: sheet.entry,
+                        title: title,
+                        content: content,
+                        date: date
+                    )
                 }
                 .presentationDetents([.large])
                 .presentationDragIndicator(.visible)
@@ -157,7 +136,6 @@ struct JournalView: View {
             }
             
             // MARK: - Toolbar
-            
             .toolbar {
                 
                 ToolbarItem(placement: .principal) {
@@ -183,10 +161,9 @@ struct JournalView: View {
                             .font(.system(size: 20))
                             .foregroundStyle(Color.primaryText)
                     }
-                    
+
                     Button {
-                        selectedJournal = nil
-                        showEditor = true
+                        editorSheet = JournalEditorSheet(entry: nil)
                     } label: {
                         Image(systemName: "plus")
                             .font(.system(size: 22, weight: .medium))
