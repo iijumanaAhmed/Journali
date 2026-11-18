@@ -1,5 +1,6 @@
 <div align="center">
 <img src="ScreenShots/App Logo.png" alt="Journali app logo" width="200">
+  
 # Journali
 
 ### Your thoughts, your story.
