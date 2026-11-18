@@ -6,7 +6,7 @@
 
 A simple, personal journaling app built with **SwiftUI**, designed to give users a calm space to write, edit, and organize their thoughts.
 
-<img src="Screenshots/App Logo.png" alt="Journali app logo" width="700">
+<img src="ScreenShots/App Logo.png" alt="Journali app logo" width="700">
 
 <br>
 
@@ -44,11 +44,11 @@ The current build allows users to:
 
 | Splash Screen | Journal Screen |
 |:---:|:---:|
-| ![Splash Screen](Screenshots/Splash Screen.png) | ![Journal Screen](Screenshots/Journal Screen.png) |
+| ![Splash Screen](ScreenShots/Splash Screen.png) | ![Journal Screen](ScreenShots/Journal Screen.png) |
 
 | Journal Editor | Sorting |
 |:---:|:---:|
-| ![Journal Editor](Screenshots/Journal Editor.png) | ![Sorting](Screenshots/Sort Screen.png) |
+| ![Journal Editor](ScreenShots/Journal Editor.png) | ![Sorting](ScreenShots/Sort Screen.png) |
 
 </div>
 
