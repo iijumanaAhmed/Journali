@@ -1,12 +1,10 @@
 <div align="center">
-
-# 📄 Journali
+<img src="ScreenShots/App Logo.png" alt="Journali app logo" width="200">
+# Journali
 
 ### Your thoughts, your story.
 
 A simple, personal journaling app built with **SwiftUI**, designed to give users a calm space to write, edit, and organize their thoughts.
-
-<img src="ScreenShots/App Logo.png" alt="Journali app logo" width="700">
 
 <br>
 
@@ -44,11 +42,11 @@ The current build allows users to:
 
 | Splash Screen | Journal Screen |
 |:---:|:---:|
-| ![Splash Screen](ScreenShots/Splash Screen.png) | ![Journal Screen](ScreenShots/Journal Screen.png) |
+| <img src="ScreenShots/Splash Screen.png" alt="Splash Screen" width="200"> | <img src="ScreenShots/Journal Screen.png" alt="Journal Screen" width="200"> |
 
 | Journal Editor | Sorting |
 |:---:|:---:|
-| ![Journal Editor](ScreenShots/Journal Editor.png) | ![Sorting](ScreenShots/Sort Screen.png) |
+| <img src="ScreenShots/Journal Editor.png" alt="Journal Editor" width="200"> | <img src="ScreenShots/Sort Screen.png" alt="Sort Screen" width="200"> |
 
 </div>
 
