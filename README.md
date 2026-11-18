@@ -16,7 +16,6 @@ A simple, personal journaling app built with **SwiftUI**, designed to give users
 
 </div>
 
----
 
 ## ✨ About
 
